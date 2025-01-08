@@ -1,0 +1,202 @@
+table Medidas
+	lineageTag: 447e3227-6406-4da6-8eff-037e585b11f2
+
+	measure 'Meta Sustentação' = 8
+		formatString: 0
+		lineageTag: 49fa2659-1346-4a33-8d88-86fe0d75dce3
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Total de OS' = COALESCE(COUNT(CHAMADOS_BI[cd_os]), 0)
+		formatString: 0
+		lineageTag: be40de14-fc75-4e44-890a-c6e24408cf34
+
+	measure 'Meta Inovação' = 60
+		formatString: 0
+		lineageTag: cfaa2c04-5c1e-4467-b31d-bea36b7926bc
+
+	measure 'Taxa de Resposta' =
+			
+			VAR resposta =
+			DIVIDE(
+			    CALCULATE(
+			        DISTINCTCOUNT(RESPOSTAS_ANO_ATUAL_SOLUCOES[cd_os]),
+			        FILTER(
+			            CHAMADOS_BI,
+			            CHAMADOS_BI[ds_status] = "CONCLUÍDO" &&
+			            (CHAMADOS_BI[tipo_os] = "SOFTWARE" || CHAMADOS_BI[tipo_os] = "SOFTWARE PROJETO")
+			        )
+			    ),
+			    CALCULATE(
+			        COUNT(CHAMADOS_BI[cd_os]),
+			        FILTER(
+			            CHAMADOS_BI,
+			            CHAMADOS_BI[ds_status] = "CONCLUÍDO" &&
+			            (CHAMADOS_BI[tipo_os] = "SOFTWARE" || CHAMADOS_BI[tipo_os] = "SOFTWARE PROJETO")
+			        )
+			    )
+			)
+			RETURN
+			IF(
+			    ISBLANK(resposta) = TRUE(),
+			    BLANK(),
+			    resposta
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: eaa67ccc-4929-4f49-966c-df1bd5ef9226
+
+		changedProperty = FormatString
+
+	measure 'Meta Taxa de Resposta' = 0.15
+		formatString: 0%;-0%;0%
+		lineageTag: 8f5ba12a-40b0-47a0-ba7c-7532de664214
+
+		changedProperty = FormatString
+
+	measure 'SLA Inovação' =
+			
+			DIVIDE(
+			    CALCULATE(
+			        [Total de OS],
+			        filter(
+			            CHAMADOS_BI,
+			            CHAMADOS_BI[Tipo] = "INOVAÇÃO" &&
+			            CHAMADOS_BI[SLA] = "DENTRO" &&
+			            CHAMADOS_BI[SLA] <> BLANK()
+			        )
+			    ),
+			    CALCULATE(
+			        [Total de OS],
+			        filter(
+			            CHAMADOS_BI,
+			            CHAMADOS_BI[Tipo] = "INOVAÇÃO" &&
+			            CHAMADOS_BI[SLA] <> BLANK()
+			        )
+			    )
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: b615bdc8-7629-4149-a1f6-1c4f518e2df6
+
+		changedProperty = FormatString
+
+	measure 'SLA Sustentação' =
+			
+			DIVIDE(
+			    CALCULATE(
+			        [Total de OS],
+			        filter(
+			            CHAMADOS_BI,
+			            CHAMADOS_BI[Tipo] = "SUSTENTAÇÃO" &&
+			            CHAMADOS_BI[SLA] = "DENTRO"
+			        )
+			    ),
+			    CALCULATE(
+			        [Total de OS],
+			        filter(
+			            CHAMADOS_BI,
+			            CHAMADOS_BI[Tipo] = "SUSTENTAÇÃO"
+			        )
+			    )
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 19d39cea-404b-4065-95f4-77a81ca69f67
+
+		changedProperty = FormatString
+
+	measure 'Formatação Backlog' =
+			
+			SWITCH(
+			    SELECTEDVALUE('CHAMADOS_BI'[Prazo]),
+			    "No Prazo", 1,
+			    "Em Risco", 2,
+			    "Fora do Prazo", 3
+			)
+		formatString: 0
+		lineageTag: 410e8e3c-315c-46b6-b51f-6928526b3fa0
+
+	measure 'Título Chamados' =
+			
+			IF(
+			    ISFILTERED(CHAMADOS_BI[Tipo]),
+			    CONCATENATE(
+			        "Total de Chamados Concluídos - ",
+			        SELECTEDVALUE(CHAMADOS_BI[Tipo])
+			    ),
+			    "Total de Chamados Concluídos"
+			)
+		lineageTag: 419ea5e1-6c88-4f2c-88c2-712a36ce89ab
+
+	measure Nota = AVERAGE(RESPOSTAS_ANO_ATUAL_SOLUCOES[vl_nota])
+		formatString: 0.00
+		lineageTag: 7a7d62d3-7ec3-417c-b5d4-7a3a2793236d
+
+	measure 'Total de Inovação' =
+			
+			CALCULATE(
+			    COUNT(CHAMADOS_BI[cd_os]),
+			    FILTER(
+			        CHAMADOS_BI,
+			        CHAMADOS_BI[Tipo] = "Inovação"
+			    )
+			)
+		formatString: 0
+		lineageTag: 21dbf25f-6b6d-47ff-adb3-fd995c759f1c
+
+	measure 'Total de Sustentação' =
+			
+			CALCULATE(
+			    COUNT(CHAMADOS_BI[cd_os]),
+			    FILTER(
+			        CHAMADOS_BI,
+			        CHAMADOS_BI[Tipo] = "Sustentação"
+			    )
+			)
+		formatString: 0
+		lineageTag: 64c36bc8-ee98-4ffb-b06a-4212aaea3d5f
+
+	measure 'Total de Aberturas' =
+			
+			CALCULATE(
+			    COUNT(CHAMADOS_BI[cd_os]),
+			    USERELATIONSHIP(CHAMADOS_BI[Data Abertura], 'Calendário'[Data]),
+			    CROSSFILTER(CHAMADOS_BI[Data Fim], 'Calendário'[Data], None)
+			)
+		formatString: 0
+		lineageTag: 99a92801-9bbb-4b76-a326-e3680056dec0
+
+	measure 'Meta Nota Pesquisa' = 4.5
+		lineageTag: ac78f751-6350-4c01-9c24-8ced5e1225ba
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'SLA Meta' = 0.9
+		formatString: 0%;-0%;0%
+		lineageTag: 49c95ae0-c292-4059-b1ea-7141e12f0001
+
+	measure 'Formatação SLA Congelado' =
+			
+			IF(
+			    SELECTEDVALUE(CHAMADOS_BI[ds_status]) IN {"AGENDAMENTO", "PENDENTE CLIENTE", "PENDENTE FORNECEDOR"},
+			    1
+			)
+		formatString: 0
+		lineageTag: 13047637-e058-47a1-a070-82ab36b95f8e
+
+	partition Medidas-79544295-b4b5-46c0-a7a6-e760173f95e9 = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Coluna 1" = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"Coluna 1", type text}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Tipo Alterado",{"Coluna 1"}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Colunas Removidas", "Personalizar", each 1),
+				    #"Colunas Removidas1" = Table.RemoveColumns(#"Personalização Adicionada",{"Personalizar"})
+				in
+				    #"Colunas Removidas1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

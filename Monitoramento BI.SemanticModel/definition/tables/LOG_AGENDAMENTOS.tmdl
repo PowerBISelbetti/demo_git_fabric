@@ -1,0 +1,221 @@
+table LOG_AGENDAMENTOS
+	lineageTag: 494af341-e2f3-4881-96db-c12c6a035e11
+
+	column Agora =
+			//COALESCE(LOG_AGENDAMENTOS[dt_saida_agendamento], NOW() - 0.125)
+			
+			VAR inicio_sla = FORMAT(CONVERT("07:30:00",DATETIME), "long time")   //<<< REFERENCIAR INICIO DO EXPEDIENTE
+			VAR inicio_almoco = FORMAT(CONVERT("12:00:00",DATETIME), "long time") //<<< REFERENCIAR INICIO DO ALMOÇO
+			VAR fim_almoco = FORMAT(CONVERT("13:12:00",DATETIME), "long time")   //<<< REFERENCIAR RETORNO DO ALMOÇO
+			VAR fim_sla = FORMAT(CONVERT("17:30:00",DATETIME), "long time")    //<<< REFERENCIAR FIM DO EXPEDIENTE
+			VAR evento1 = FORMAT( LOG_AGENDAMENTOS[dt_agendamento], "long time" )  //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 1
+			VAR evento2 = FORMAT (  COALESCE(LOG_AGENDAMENTOS[dt_saida_agendamento], NOW()), "long time" )  //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 2
+			VAR dia_evento1 = DATE(YEAR(LOG_AGENDAMENTOS[dt_agendamento]), MONTH(LOG_AGENDAMENTOS[dt_agendamento]), DAY(LOG_AGENDAMENTOS[dt_agendamento]))    //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 1
+			VAR dia_evento2 =  COALESCE(LOG_AGENDAMENTOS[dt_saida_agendamento], NOW())    //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 2
+			RETURN
+			evento2
+		dataType: string
+		lineageTag: fd8df4b5-285f-45b7-acdc-bfdf7ee759be
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column vl_os
+		dataType: int64
+		formatString: 0
+		lineageTag: 32c995fe-a432-450d-b964-50c1e7538163
+		summarizeBy: sum
+		sourceColumn: vl_os
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_usuario_agendamento
+		dataType: string
+		lineageTag: 0c71fc67-030e-4ead-b9c0-67510fbd0169
+		summarizeBy: none
+		sourceColumn: ds_usuario_agendamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_agendamento
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 98fa4a2c-bb54-4b63-9e53-39400c6c45ff
+		summarizeBy: none
+		sourceColumn: dt_agendamento
+
+		variation Variation
+			isDefault
+			relationship: 56cc05b2-120d-4c50-ac26-4620a255b665
+			defaultHierarchy: LocalDateTable_72f452ef-2daa-4af6-b071-3dc9e3704c7a.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_saida_agendamento
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 27baea87-635e-4e30-b086-22bb41add994
+		summarizeBy: none
+		sourceColumn: dt_saida_agendamento
+
+		variation Variation
+			isDefault
+			relationship: a6689aa2-19e1-422e-a4c8-4172beb997b6
+			defaultHierarchy: LocalDateTable_9e883c75-0c93-466f-be9e-13fde987095e.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column horas_uteis_agendamento_funcao
+		dataType: string
+		lineageTag: 65c14dfb-6b6d-4b65-816c-4f3562cd08f4
+		summarizeBy: none
+		sourceColumn: horas_uteis_agendamento_funcao
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_usuario_saida_agendamento
+		dataType: string
+		lineageTag: 7f32b7f3-098c-4242-a76a-d9bae5fc9b95
+		summarizeBy: none
+		sourceColumn: ds_usuario_saida_agendamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_status_saida_agendamento
+		dataType: string
+		lineageTag: 52ba89e0-2da8-4c19-a654-ade0f29de91f
+		summarizeBy: none
+		sourceColumn: ds_status_saida_agendamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Horas Úteis em Agendamento' = ```
+			
+			VAR inicio_sla = FORMAT(CONVERT("07:30:00",DATETIME), "long time")   //<<< REFERENCIAR INICIO DO EXPEDIENTE
+			VAR inicio_almoco = FORMAT(CONVERT("12:00:00",DATETIME), "long time") //<<< REFERENCIAR INICIO DO ALMOÇO
+			VAR fim_almoco = FORMAT(CONVERT("13:12:00",DATETIME), "long time")   //<<< REFERENCIAR RETORNO DO ALMOÇO
+			VAR fim_sla = FORMAT(CONVERT("17:30:00",DATETIME), "long time")    //<<< REFERENCIAR FIM DO EXPEDIENTE
+			VAR evento1 = FORMAT( LOG_AGENDAMENTOS[dt_agendamento], "long time" )  //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 1
+			VAR evento2 = FORMAT ( LOG_AGENDAMENTOS[dt_saida_agendamento], "long time" )  //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 2
+			VAR dia_evento1 = DATE(YEAR(LOG_AGENDAMENTOS[dt_agendamento]), MONTH(LOG_AGENDAMENTOS[dt_agendamento]), DAY(LOG_AGENDAMENTOS[dt_agendamento]))    //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 1
+			VAR dia_evento2 = LOG_AGENDAMENTOS[dt_saida_agendamento].[Date]   //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 2
+			RETURN
+			//Definindo horas consideradas como início de SLA dos eventos 1 e 2//
+			VAR hr_evento1 =
+			    IF (
+			        evento1 <= inicio_sla,
+			        inicio_sla,
+			        IF (
+			            evento1 <= inicio_almoco,
+			            evento1,
+			            IF (
+			                evento1 <= fim_almoco,
+			                fim_almoco,
+			                IF ( evento1 <= fim_sla, evento1, fim_sla )
+			            )
+			        )
+			    )
+			VAR hr_evento2 =
+			    IF (
+			        evento2 >= fim_sla,
+			        fim_sla,
+			        IF (
+			            evento2 >= fim_almoco,
+			            evento2,
+			            IF (
+			                evento2 >= inicio_almoco,
+			                inicio_almoco,
+			                IF ( evento2 >= inicio_sla, evento2, inicio_sla )
+			            )
+			        )
+			    ) 
+			        
+			//DEFININDO DURAÇÃO DA HORA DE ALMOÇO
+			        
+			VAR hr_almoco_dias_diferentes_1 =
+			    IF ( evento1 < inicio_almoco, fim_almoco - inicio_almoco, 0 )
+			VAR hr_almoco_dias_diferentes_2 =
+			    IF ( evento2 > fim_almoco, fim_almoco - inicio_almoco, 0 )
+			VAR hr_almoco_mesmo_dia =
+			    IF (
+			        AND ( evento1 < inicio_almoco, evento2 > fim_almoco ),
+			        fim_almoco - inicio_almoco,
+			        IF (
+			            AND ( evento1 > inicio_almoco, evento2 < fim_almoco ),
+			            inicio_almoco - fim_almoco
+			        )
+			    )
+			RETURN
+			
+			//CÁLCULO DE HORAS ÚTEIS - EVENTOS OCORREM NO MESMO DIA
+			
+			IF (
+			    dia_evento1 = dia_evento2,
+			    IF (
+			        LOOKUPVALUE ( 'CALENDÁRIO'[Dia Útil], 'CALENDÁRIO'[Data].[Date], dia_evento1 ) = 1,
+			        IF (
+			            ( ( hr_evento2 - hr_evento1 - hr_almoco_mesmo_dia ) * 24 ) < 0,
+			            0,
+			            ( ( hr_evento2 - hr_evento1 - hr_almoco_mesmo_dia ) * 24 )
+			        ),
+			        0
+			    ),         
+			    //CÁLCULO DE HORAS ÚTEIS - EVENTOS CORREM EM DIAS DIFERENTES
+			    
+			    IF (
+			        dia_evento1 > dia_evento2
+			            || dia_evento1 = 0
+			            || dia_evento2 = 0,
+			        0,
+			        VAR hr_dia_1 =
+			            IF (
+			                LOOKUPVALUE ( 'CALENDÁRIO'[Dia Útil], 'CALENDÁRIO'[Data].[Date], dia_evento1 ) = 1,
+			                fim_sla - hr_evento1 - hr_almoco_dias_diferentes_1,
+			                0
+			            )
+			        VAR hr_dia_inter =
+			            CALCULATE (
+			                SUM ( 'CALENDÁRIO'[Dia Útil] ),
+			                DATESBETWEEN (
+			                    'CALENDÁRIO'[Data],
+			                    dia_evento1 + 1,
+			                    dia_evento2 - 1
+			                )
+			            ) * ( ( inicio_almoco - inicio_sla ) + ( fim_sla - fim_almoco ) )
+			        VAR hr_dia_final =
+			            IF (
+			                LOOKUPVALUE ( 'CALENDÁRIO'[Dia Útil], 'CALENDÁRIO'[Data].[Date], dia_evento2 ) = 1,
+			                hr_evento2 - inicio_sla - hr_almoco_dias_diferentes_2,
+			                0
+			            )
+			        RETURN
+			            IF (
+			                ( ( hr_dia_1 + hr_dia_inter + hr_dia_final ) * 24 ) < 0,
+			                0,
+			                ( ( hr_dia_1 + hr_dia_inter + hr_dia_final ) * 24 )
+			            )
+			    )
+			)
+			```
+		dataType: double
+		lineageTag: 453d198a-e1d5-4126-90cc-1a1df85fa1fb
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition LOG_AGENDAMENTOS = m
+		mode: import
+		source =
+				let
+				    Fonte = Sql.Database("samsung\matriz", "smartmanager", [Query="SELECT#(lf)#(tab)*,#(lf)#(tab)[DATALAKE_BI].dbo.FN_CALCULO_HORAS_UTEIS(dt_agendamento,COALESCE(dt_saida_agendamento, getdate()),1) AS horas_uteis_agendamento_funcao#(lf)FROM#(lf)(#(lf)#(tab)SELECT#(lf)#(tab)#(tab)vl_os,#(lf)#(tab)#(tab)ds_usuario AS ds_usuario_agendamento,#(lf)#(tab)#(tab)dt_log_os AS dt_agendamento,#(lf)#(tab)#(tab)(#(lf)#(tab)#(tab)SELECT TOP 1#(lf)#(tab)#(tab)#(tab)ds_usuario#(lf)#(tab)#(tab)FROM#(lf)#(tab)#(tab)#(tab)LOG_OS AS LOG_SAIDA WITH (NOLOCK)#(lf)#(tab)#(tab)WHERE#(lf)#(tab)#(tab)#(tab)LOG_SAIDA.vl_os = LOG_OS.vl_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.dt_log_os >  LOG_OS.dt_log_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.cd_status NOT IN (19) --Status que não encerram AGENDAMENTO#(lf)#(tab)#(tab)ORDER BY dt_log_os ASC#(lf)#(tab)#(tab)) ds_usuario_saida_agendamento,#(lf)#(tab)#(tab)(#(lf)#(tab)#(tab)SELECT TOP 1#(lf)#(tab)#(tab)#(tab)ds_status#(lf)#(tab)#(tab)FROM#(lf)#(tab)#(tab)#(tab)LOG_OS AS LOG_SAIDA WITH (NOLOCK)#(lf)#(tab)#(tab)#(tab)INNER JOIN STATUS WITH (NOLOCK) ON STATUS.cd_status = LOG_SAIDA.cd_status#(lf)#(tab)#(tab)WHERE#(lf)#(tab)#(tab)#(tab)LOG_SAIDA.vl_os = LOG_OS.vl_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.dt_log_os >  LOG_OS.dt_log_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.cd_status NOT IN (19) --Status que não encerram AGENDAMENTO#(lf)#(tab)#(tab)ORDER BY dt_log_os ASC#(lf)#(tab)#(tab)) ds_status_saida_agendamento,#(lf)#(tab)#(tab)(#(lf)#(tab)#(tab)SELECT TOP 1#(lf)#(tab)#(tab)#(tab)dt_log_os#(lf)#(tab)#(tab)FROM#(lf)#(tab)#(tab)#(tab)LOG_OS AS LOG_SAIDA WITH (NOLOCK)#(lf)#(tab)#(tab)WHERE#(lf)#(tab)#(tab)#(tab)LOG_SAIDA.vl_os = LOG_OS.vl_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.dt_log_os >  LOG_OS.dt_log_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.cd_status NOT IN (19) --Status que não encerram AGENDAMENTO#(lf)#(tab)#(tab)ORDER BY dt_log_os ASC#(lf)#(tab)#(tab)) dt_saida_agendamento#(lf)#(tab)FROM#(lf)#(tab)#(tab)LOG_OS WITH (NOLOCK)#(lf)#(tab)#(tab)INNER JOIN ORDEM_SERVICO WITH (NOLOCK) ON ORDEM_SERVICO.cd_os = LOG_OS.vl_os#(lf)#(tab)WHERE#(lf)#(tab)#(tab)cd_selb = 'PWBI'#(lf)#(tab)#(tab)AND cd_status = 32#(lf)                AND YEAR(dt_log_os) >= 2023#(lf)) AS LOG_AGENDAMENTO"]),
+				    #"Valor Substituído" = Table.ReplaceValue(Fonte,null,DateTimeZone.SwitchZone(DateTimeZone.LocalNow(),-3,0),Replacer.ReplaceValue,{"dt_saida_agendamento"}),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Valor Substituído",{{"dt_saida_agendamento", type datetime}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

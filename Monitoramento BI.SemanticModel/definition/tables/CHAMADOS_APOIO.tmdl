@@ -1,0 +1,123 @@
+table CHAMADOS_APOIO
+	lineageTag: d891dd8e-6534-4641-ad22-4e469da74702
+
+	column cd_os
+		dataType: int64
+		formatString: 0
+		lineageTag: 8a5938b1-9543-45ca-9e88-89c8949c90ac
+		summarizeBy: sum
+		sourceColumn: cd_os
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_ini
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0576f644-f664-47ed-98ff-c4602aae8e59
+		summarizeBy: none
+		sourceColumn: dt_ini
+
+		variation Variation
+			isDefault
+			relationship: fa7423fa-f478-474a-ae68-d672421d705a
+			defaultHierarchy: LocalDateTable_f3be5672-437e-421e-8487-ab5e163be611.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_fim
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2d84375a-2093-41da-9853-0fe72019716d
+		summarizeBy: none
+		sourceColumn: dt_fim
+
+		variation Variation
+			isDefault
+			relationship: a847a9bb-1ebb-4e21-826f-48e2dbc4b049
+			defaultHierarchy: LocalDateTable_957075cb-490e-4155-9760-d544c5bab155.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Solicitante
+		dataType: string
+		lineageTag: 01191533-dfa4-4769-bf14-7f837aac81b3
+		summarizeBy: none
+		sourceColumn: Solicitante
+
+		annotation SummarizationSetBy = Automatic
+
+	column Consultor
+		dataType: string
+		lineageTag: a303e6bc-2393-4622-a871-7dfe07d6313b
+		summarizeBy: none
+		sourceColumn: Consultor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Serviço
+		dataType: string
+		lineageTag: a64bf7dd-6dc4-440f-934d-b03016220007
+		summarizeBy: none
+		sourceColumn: Serviço
+
+		annotation SummarizationSetBy = Automatic
+
+	column Solução
+		dataType: string
+		lineageTag: cfb8a476-5316-484a-9dc7-b13360a0031a
+		summarizeBy: none
+		sourceColumn: Solução
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Data Fim' = CHAMADOS_APOIO[dt_fim].[Date]
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c5292d23-e7e7-41d0-b8ee-43c0cb4203cf
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column horas_uteis_conclusao
+		dataType: string
+		lineageTag: 1e532f6b-abfb-476a-a364-890f4bb7280f
+		summarizeBy: none
+		sourceColumn: horas_uteis_conclusao
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Horas Úteis Em Aberto'
+		dataType: double
+		lineageTag: c601cfd4-2c24-419c-b0bf-70bd56ffa65f
+		summarizeBy: sum
+		sourceColumn: Horas Úteis Em Aberto
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ds_status
+		dataType: string
+		lineageTag: e88d1acb-1db7-4fad-8f12-9791e9f4f86a
+		summarizeBy: none
+		sourceColumn: ds_status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition CHAMADOS_APOIO = m
+		mode: import
+		source =
+				let
+				    Fonte = Sql.Database("samsung\matriz", "smartmanager", [Query="--CHAMADOS APOIO TIME DE BI#(lf)#(lf)SELECT#(lf)#(tab)cd_os,#(lf)#(tab)ds_status,#(lf)#(tab)dt_ini,#(lf)#(tab)dt_fim,#(lf)#(tab)ds_funcionario AS 'Solicitante',#(lf)#(tab)ds_funcionario_atd_concluido AS 'Consultor',#(lf)#(tab)ds_servico AS 'Serviço',#(lf)#(tab)ds_obs AS 'Solução',#(lf)#(tab)[DATALAKE_BI].dbo.FN_CALCULO_HORAS_UTEIS(dt_ini,COALESCE(dt_fim, getdate()),1) AS horas_uteis_conclusao#(lf)FROM#(lf)#(tab)(#(lf)#(tab)#(tab)SELECT#(lf)#(tab)#(tab)#(tab)*,#(lf)#(tab)#(tab)#(tab)(#(tab)SELECT TOP 1#(lf)#(tab)#(tab)#(tab)#(tab)#(tab)ds_funcionario#(lf)#(tab)#(tab)#(tab)#(tab)FROM#(lf)#(tab)#(tab)#(tab)#(tab)#(tab)LOG_OS WITH (NOLOCK) #(lf)#(tab)#(tab)#(tab)#(tab)#(tab)INNER JOIN FUNCIONARIO WITH (NOLOCK) ON FUNCIONARIO.ds_usuario = LOG_OS.ds_usuario#(lf)#(tab)#(tab)#(tab)#(tab)WHERE#(lf)#(tab)#(tab)#(tab)#(tab)#(tab)vl_os = ORDEM_SERVICO.cd_os#(lf)#(tab)#(tab)#(tab)#(tab)#(tab)AND cd_status = 5#(lf)#(tab)#(tab)#(tab)) AS ds_funcionario_atd_concluido#(lf)#(tab)#(tab)FROM#(lf)#(tab)#(tab)#(tab)ORDEM_SERVICO#(lf)#(tab)#(tab)WHERE#(lf)#(tab)#(tab)#(tab)ds_identificacao3 = 'SERVICO ADICIONAL'#(lf)#(tab)#(tab)#(tab)AND YEAR(dt_fim) >= 2023#(lf)#(tab)) AS X#(lf)#(tab)LEFT JOIN FUNCIONARIO WITH (NOLOCK) ON FUNCIONARIO.ds_usuario = X.ds_numero_serie#(lf)#(tab)LEFT JOIN STATUS WITH (NOLOCK) ON STATUS.cd_status = X.vl_status#(lf)WHERE#(lf)#(tab)LEFT(ds_funcionario_atd_concluido, 3) IN ('BI ', 'RPA ')#(lf)ORDER BY#(lf)#(tab)cd_os DESC"]),
+				    #"Texto Inserido Antes do Delimitador" = Table.AddColumn(Fonte, "Texto Antes do Delimitador", each Text.BeforeDelimiter([horas_uteis_conclusao], ":"), type text),
+				    #"Texto Inserido Após o Delimitador" = Table.AddColumn(#"Texto Inserido Antes do Delimitador", "Texto Após o Delimitador", each Text.AfterDelimiter([horas_uteis_conclusao], ":"), type text),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Texto Inserido Após o Delimitador",{{"Texto Antes do Delimitador", Int64.Type}, {"Texto Após o Delimitador", Int64.Type}}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Tipo Alterado", "Horas Úteis Em Aberto", each (([Texto Antes do Delimitador] * 60) + [Texto Após o Delimitador]) / 60),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Personalização Adicionada",{{"Horas Úteis Em Aberto", type number}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Tipo Alterado1",{"Texto Antes do Delimitador", "Texto Após o Delimitador"})
+				in
+				    #"Colunas Removidas"
+
+	annotation PBI_ResultType = Exception
+

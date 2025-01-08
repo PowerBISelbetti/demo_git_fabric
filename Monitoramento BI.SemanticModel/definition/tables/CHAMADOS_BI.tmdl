@@ -1,0 +1,761 @@
+table CHAMADOS_BI
+	lineageTag: 7627f5ce-d694-4870-90b4-4d46747a062c
+
+	column cd_os
+		dataType: int64
+		formatString: 0
+		lineageTag: ba67e886-b777-4939-9b73-6bf2770933ab
+		summarizeBy: none
+		sourceColumn: cd_os
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_solicitante
+		dataType: string
+		lineageTag: 870b8aa5-8c71-4fb8-9c11-9370354dee1f
+		summarizeBy: none
+		sourceColumn: ds_solicitante
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_os
+		dataType: string
+		lineageTag: 001a2212-d7cf-4c5c-9f4c-8bbdd69cc961
+		summarizeBy: none
+		sourceColumn: tipo_os
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_status
+		dataType: string
+		lineageTag: 22d6456f-ba52-4c31-880e-d9d18d3bbe90
+		summarizeBy: none
+		sourceColumn: ds_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_servico
+		dataType: string
+		lineageTag: e50c01c9-5d4c-45aa-9df1-d6678367b97b
+		summarizeBy: none
+		sourceColumn: ds_servico
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_solucao
+		dataType: string
+		lineageTag: edd8534b-c06f-4c15-965d-cea30e0b55d0
+		summarizeBy: none
+		sourceColumn: ds_solucao
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_os_categoria
+		dataType: string
+		lineageTag: a59c6f7d-6c3d-43f8-96ac-2c7dadf31570
+		summarizeBy: none
+		sourceColumn: ds_os_categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_os_produto
+		dataType: string
+		lineageTag: 23ef1a38-b4a0-4f1a-8d5e-a1f2dacdc4c7
+		summarizeBy: none
+		sourceColumn: ds_os_produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_os_processo
+		dataType: string
+		lineageTag: 2708e196-48ce-4f81-9778-180aaff9cb45
+		summarizeBy: none
+		sourceColumn: ds_os_processo
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_os_problema
+		dataType: string
+		lineageTag: c995205b-3020-472c-9441-49657af19680
+		summarizeBy: none
+		sourceColumn: ds_os_problema
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_abertura
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f1f835ac-636f-48c4-b77d-06c623f59d57
+		summarizeBy: none
+		sourceColumn: dt_abertura
+
+		variation Variation
+			isDefault
+			relationship: 7b205ffb-053e-4fba-98e4-46c8cb77fe28
+			defaultHierarchy: LocalDateTable_702baf06-f66e-48e8-99f5-cce585afa838.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_fim
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3ac2cb05-89f4-47d3-b29f-00119ae6ccc7
+		summarizeBy: none
+		sourceColumn: dt_fim
+
+		variation Variation
+			isDefault
+			relationship: 493bcbfe-38c6-4ab6-91d9-6f25b2f75f3a
+			defaultHierarchy: LocalDateTable_6a8d2090-f0cc-4261-8c82-ac806fdd0dae.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_tecnico
+		dataType: string
+		lineageTag: 72ef4238-1373-48e8-a6cb-4e5cb5a0e72c
+		summarizeBy: none
+		sourceColumn: ds_tecnico
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_regiao_tecnico
+		dataType: string
+		lineageTag: b5fc123b-2e7d-48a1-9b46-a0e5b42c114e
+		summarizeBy: none
+		sourceColumn: ds_regiao_tecnico
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Dias Úteis em Aberto' =
+			
+			IF(
+			    CHAMADOS_BI[ds_status] = "CONCLUÍDO" || CHAMADOS_BI[ds_status] = "OS CANCELADA",
+			    CALCULATE(
+			        SUM('Calendário'[Dia Útil]),
+			        FILTER(
+			            'Calendário',
+			            'Calendário'[Data] >= DATE(YEAR(CHAMADOS_BI[dt_abertura]), MONTH(CHAMADOS_BI[dt_abertura]), DAY(CHAMADOS_BI[dt_abertura]))  &&
+			            'Calendário'[Data] <= CHAMADOS_BI[dt_fim]
+			        )
+			    ),
+			    CALCULATE(
+			        SUM('Calendário'[Dia Útil]),
+			        FILTER(
+			            'Calendário',
+			            'Calendário'[Data] >= CHAMADOS_BI[dt_abertura] &&
+			            'Calendário'[Data] <= TODAY()
+			        )
+			    )
+			)
+		dataType: int64
+		formatString: 0
+		lineageTag: a848d59d-8978-4085-832e-c29231187a1b
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo Dias em Aberto' =
+			
+			IF(
+			    CHAMADOS_BI[Dias Úteis em Aberto] <= 5,
+			    "01 à 05",
+			    IF(
+			        CHAMADOS_BI[Dias Úteis em Aberto] <= 10,
+			        "06 à 10",
+			        IF(
+			            CHAMADOS_BI[Dias Úteis em Aberto] <= 15,
+			            "11 à 15",
+			            IF(
+			                CHAMADOS_BI[Dias Úteis em Aberto] <= 20,
+			                "16 à 20",
+			                "Mais de 20"
+			            )
+			        )
+			    )
+			)
+			
+			/* IF(
+			    CHAMADOS_BI[Dias Úteis em Aberto] <= 5,
+			    "A) 1 à 5",
+			    IF(
+			        CHAMADOS_BI[Dias Úteis em Aberto] <= 10,
+			        "B) 6 à 10",
+			        IF(
+			            CHAMADOS_BI[Dias Úteis em Aberto] <= 15,
+			            "C) 11 à 15",
+			            IF(
+			                CHAMADOS_BI[Dias Úteis em Aberto] <= 20,
+			                "D) 16 à 20",
+			                "E) > 20"
+			            )
+			        )
+			    )
+			) */
+		dataType: string
+		lineageTag: df7cf618-46ae-49e7-a139-52358911c6cd
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tipo =
+			
+			SWITCH(
+			    CHAMADOS_BI[tipo_os],
+			    "SOFTWARE", "Sustentação",
+			    "SOFTWARE PROJETO", "Inovação"
+			)
+		dataType: string
+		lineageTag: 15d9ee24-830f-4a01-9b2b-fc517b0d36a4
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Eixo de Tendência' = 1
+		dataType: int64
+		formatString: 0
+		lineageTag: 7a9c8f03-7c62-4096-a20b-2f1464396b03
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column Prazo =
+			
+			VAR prazo =
+			SWITCH(
+			    CHAMADOS_BI[Tipo],
+			    "Inovação", 60,
+			    "Sustentação", 8
+			)
+			VAR limite=
+			SWITCH(
+			    CHAMADOS_BI[Tipo],
+			    "Inovação", 0.8,
+			    "Sustentação", 0.5
+			)
+			RETURN
+			IF(
+			   CHAMADOS_BI[ds_status] <> "CONCLUÍDO" && CHAMADOS_BI[ds_status] <> "OS CANCELADA",
+			    IF(
+			        CHAMADOS_BI[Tempo Total em Aberto] < (prazo * limite),
+			        "No Prazo",
+			        IF(
+			            CHAMADOS_BI[Tempo Total em Aberto] < (prazo),
+			            "Em Risco",
+			            "Fora do Prazo"
+			        )
+			    )
+			)
+		dataType: string
+		lineageTag: bc3e5178-c49a-4035-b355-75d343b0170a
+		summarizeBy: none
+		isDataTypeInferred
+		sortByColumn: 'formatação Prazo'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_aberta_por
+		dataType: string
+		lineageTag: 59f59cea-7fe7-4b92-9fe7-be8ba6b089a5
+		summarizeBy: none
+		sourceColumn: ds_aberta_por
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_fim_considerada =
+			CHAMADOS_BI[dt_fim]
+			/* COALESCE(
+			    CHAMADOS_BI[dt_fim],
+			    UTCNOW() - 0.125
+			) */
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 46e2e77d-c236-4a08-9803-5a040f8864d0
+		summarizeBy: none
+		isDataTypeInferred
+
+		variation Variation
+			isDefault
+			relationship: 860e398d-cb4e-4a7f-95d8-847fcf5afc0d
+			defaultHierarchy: LocalDateTable_10875ab9-d71e-4869-8a3d-51adeadc49f6.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_funcionario_atd_concluido
+		dataType: string
+		lineageTag: 3e28c9b2-e31f-40ee-b298-5fa49c081429
+		summarizeBy: none
+		sourceColumn: ds_funcionario_atd_concluido
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quadrimestre =
+			
+			SWITCH(
+			    CHAMADOS_BI[dt_fim].[MonthNo],
+			    1, 	"Q1",
+			    2, 	"Q1",
+			    3, 	"Q1",
+			    4, 	"Q1",
+			    5, 	"Q2",
+			    6, 	"Q2",
+			    7, 	"Q2",
+			    8, 	"Q2",
+			    9, 	"Q3",
+			    10, "Q3",
+			    11, "Q3",
+			    12, "Q3"
+			)
+		dataType: string
+		lineageTag: b59f824f-c4ca-42b3-b860-c35fab9b37be
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_login
+		dataType: string
+		lineageTag: 63fce370-0ab2-49ae-a283-e234dd47f707
+		summarizeBy: none
+		sourceColumn: ds_login
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Solicitante Tratado'
+		dataType: string
+		lineageTag: 9416a094-61a3-428c-aa05-1fedaf9d4a6a
+		summarizeBy: none
+		sourceColumn: Solicitante Tratado
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo Horas Úteis em Aberto' =
+			
+			IF(
+			    CHAMADOS_BI[Tempo Total em Aberto] < 10,
+			    "0 à 09",
+			    IF(
+			        CHAMADOS_BI[Tempo Total em Aberto] < 20,
+			        "10 à 19",
+			        IF(
+			            CHAMADOS_BI[Tempo Total em Aberto] < 40,
+			            "20 à 49",
+			            IF(
+			                CHAMADOS_BI[Tempo Total em Aberto] < 60,
+			                "40 à 50",
+			                "60+"
+			            )
+			        )
+			    )
+			)
+		dataType: string
+		lineageTag: d2c3df4a-70d6-4403-af2b-88fd610ef276
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_centro_custo
+		dataType: string
+		lineageTag: a7315d50-ff6e-4eef-8d3c-e34b7ddcdd67
+		summarizeBy: none
+		sourceColumn: ds_centro_custo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Diretoria
+		dataType: string
+		lineageTag: 95151ff0-721f-4d82-b980-721117627a35
+		summarizeBy: none
+		sourceColumn: Diretoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column Área
+		dataType: string
+		lineageTag: 60ad7dee-7ba6-4127-877e-bdea8f1be356
+		summarizeBy: none
+		sourceColumn: Área
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo Diretoria' =
+			
+			IF(
+			    CHAMADOS_BI[Diretoria] = "Serviços",
+			    "Serviços",
+			    "Outras Diretorias"
+			)
+		dataType: string
+		lineageTag: 577ce204-a513-4ec2-82d0-78d71a044950
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'formatação Prazo' =
+			
+			VAR prazo =
+			SWITCH(
+			    CHAMADOS_BI[Tipo],
+			    "Inovação", 60,
+			    "Sustentação", 8
+			)
+			VAR limite=
+			SWITCH(
+			    CHAMADOS_BI[Tipo],
+			    "Inovação", 0.8,
+			    "Sustentação", 0.5
+			)
+			RETURN
+			IF(
+			   CHAMADOS_BI[ds_status] <> "CONCLUÍDO" && CHAMADOS_BI[ds_status] <> "OS CANCELADA",
+			    IF(
+			        CHAMADOS_BI[Tempo Total em Aberto] < (prazo * limite),
+			        "3",
+			        IF(
+			            CHAMADOS_BI[Tempo Total em Aberto] < (prazo),
+			            "2",
+			            "1"
+			        )
+			    )
+			)
+		dataType: string
+		lineageTag: 28472f79-f617-4ab5-97e9-fc7a0e2c6fdb
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Data Fim' = CHAMADOS_BI[dt_fim].[Date]
+		dataType: dateTime
+		lineageTag: 26375336-3b3e-48e1-8ddf-7f27846906da
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Data Abertura' = CHAMADOS_BI[dt_abertura].[Date]
+		dataType: dateTime
+		lineageTag: c0e33814-3a04-479f-810b-e5a128cffda5
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Diretoria Visual' = CONCATENATE(CHAMADOS_BI[Diretoria], ": ")
+		dataType: string
+		lineageTag: 2f10d0f3-b249-42e2-9e38-ebee35188d1a
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Horas Úteis em Aberto' = ```
+			
+			VAR inicio_sla = FORMAT(CONVERT("07:30:00",DATETIME), "long time")   //<<< REFERENCIAR INICIO DO EXPEDIENTE
+			VAR inicio_almoco = FORMAT(CONVERT("12:00:00",DATETIME), "long time") //<<< REFERENCIAR INICIO DO ALMOÇO
+			VAR fim_almoco = FORMAT(CONVERT("13:12:00",DATETIME), "long time")   //<<< REFERENCIAR RETORNO DO ALMOÇO
+			VAR fim_sla = FORMAT(CONVERT("17:30:00",DATETIME), "long time")    //<<< REFERENCIAR FIM DO EXPEDIENTE
+			VAR evento1 = FORMAT( CHAMADOS_BI[dt_abertura], "long time" )  //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 1
+			VAR evento2 = FORMAT ( CHAMADOS_BI[dt_fim_considerada], "long time" )  //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 2
+			VAR dia_evento1 = DATE(YEAR(CHAMADOS_BI[dt_abertura]), MONTH(CHAMADOS_BI[dt_abertura]), DAY(CHAMADOS_BI[dt_abertura]))    //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 1
+			VAR dia_evento2 = CHAMADOS_BI[dt_fim_considerada].[Date]    //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 2
+			RETURN
+			//Definindo horas consideradas como início de SLA dos eventos 1 e 2//
+			VAR hr_evento1 =
+			    IF (
+			        evento1 <= inicio_sla,
+			        inicio_sla,
+			        IF (
+			            evento1 <= inicio_almoco,
+			            evento1,
+			            IF (
+			                evento1 <= fim_almoco,
+			                fim_almoco,
+			                IF ( evento1 <= fim_sla, evento1, fim_sla )
+			            )
+			        )
+			    )
+			VAR hr_evento2 =
+			    IF (
+			        evento2 >= fim_sla,
+			        fim_sla,
+			        IF (
+			            evento2 >= fim_almoco,
+			            evento2,
+			            IF (
+			                evento2 >= inicio_almoco,
+			                inicio_almoco,
+			                IF ( evento2 >= inicio_sla, evento2, inicio_sla )
+			            )
+			        )
+			    ) 
+			        
+			//DEFININDO DURAÇÃO DA HORA DE ALMOÇO
+			        
+			VAR hr_almoco_dias_diferentes_1 =
+			    IF ( evento1 < inicio_almoco, fim_almoco - inicio_almoco, 0 )
+			VAR hr_almoco_dias_diferentes_2 =
+			    IF ( evento2 > fim_almoco, fim_almoco - inicio_almoco, 0 )
+			VAR hr_almoco_mesmo_dia =
+			    IF (
+			        AND ( evento1 < inicio_almoco, evento2 > fim_almoco ),
+			        fim_almoco - inicio_almoco,
+			        IF (
+			            AND ( evento1 > inicio_almoco, evento2 < fim_almoco ),
+			            inicio_almoco - fim_almoco
+			        )
+			    )
+			RETURN
+			    
+			//CÁLCULO DE HORAS ÚTEIS - EVENTOS OCORREM NO MESMO DIA
+			
+			IF (
+			    dia_evento1 = dia_evento2,
+			    IF (
+			        LOOKUPVALUE ( 'CALENDÁRIO'[Dia Útil], 'CALENDÁRIO'[Data].[Date], dia_evento1 ) = 1,
+			        IF (
+			            ( ( hr_evento2 - hr_evento1 - hr_almoco_mesmo_dia ) * 24 ) < 0,
+			            0,
+			            ( ( hr_evento2 - hr_evento1 - hr_almoco_mesmo_dia ) * 24 )
+			        ),
+			        0
+			    ),         
+			    //CÁLCULO DE HORAS ÚTEIS - EVENTOS CORREM EM DIAS DIFERENTES
+			    
+			    IF (
+			        dia_evento1 > dia_evento2
+			            || dia_evento1 = 0
+			            || dia_evento2 = 0,
+			        0,
+			        VAR hr_dia_1 =
+			            IF (
+			                LOOKUPVALUE ( 'CALENDÁRIO'[Dia Útil], 'CALENDÁRIO'[Data].[Date], dia_evento1 ) = 1,
+			                fim_sla - hr_evento1 - hr_almoco_dias_diferentes_1,
+			                0
+			            )
+			        VAR hr_dia_inter =
+			            CALCULATE (
+			                SUM ( 'CALENDÁRIO'[Dia Útil] ),
+			                DATESBETWEEN (
+			                    'CALENDÁRIO'[Data],
+			                    dia_evento1 + 1,
+			                    dia_evento2 - 1
+			                )
+			            ) * ( ( inicio_almoco - inicio_sla ) + ( fim_sla - fim_almoco ) )
+			        VAR hr_dia_final =
+			            IF (
+			                LOOKUPVALUE ( 'CALENDÁRIO'[Dia Útil], 'CALENDÁRIO'[Data].[Date], dia_evento2 ) = 1,
+			                hr_evento2 - inicio_sla - hr_almoco_dias_diferentes_2,
+			                0
+			            )
+			        RETURN
+			            IF (
+			                ( ( hr_dia_1 + hr_dia_inter + hr_dia_final ) * 24 ) < 0,
+			                0,
+			                ( ( hr_dia_1 + hr_dia_inter + hr_dia_final ) * 24 )
+			            )
+			    )
+			)
+			```
+		dataType: double
+		lineageTag: 11f9c69c-b224-4a17-8629-b4bff5c61161
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Horas Em Agendamento' =
+			
+			CALCULATE(
+			    SUM(LOG_AGENDAMENTOS[Horas Úteis em Agendamento]),
+			    FILTER(
+			        LOG_AGENDAMENTOS,
+			        LOG_AGENDAMENTOS[vl_os] = EARLIER(CHAMADOS_BI[cd_os])
+			    )
+			)
+		dataType: double
+		lineageTag: b4f2b1bc-420e-447d-bf22-18d64c92df6d
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Horas Em Pendente' =
+			
+			CALCULATE(
+			    SUM(LOG_PENDENTE[Horas Úteis em Pendente]),
+			    FILTER(
+			        LOG_AGENDAMENTOS,
+			        LOG_AGENDAMENTOS[vl_os] = EARLIER(CHAMADOS_BI[cd_os])
+			    )
+			)
+		dataType: double
+		lineageTag: 4c6f6942-99d3-4e80-a2e1-82d6e8b301e2
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tempo Total em Aberto' = CHAMADOS_BI[Horas Úteis em Aberto] - CHAMADOS_BI[Horas Em Agendamento] - CHAMADOS_BI[Horas Em Pendente]
+		dataType: double
+		lineageTag: 56b30c3b-1e0f-49d4-ab56-6b4db6595286
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SLA =
+			
+			IF(
+			    CHAMADOS_BI[ds_status] = "CONCLUÍDO",
+			    SWITCH(
+			        TRUE(),
+			        CHAMADOS_BI[tipo_os] = "SOFTWARE",
+			        IF(
+			            CHAMADOS_BI[Tempo Total em Aberto] <= 8,
+			            "DENTRO",
+			            "FORA"
+			        ),
+			        CHAMADOS_BI[tipo_os] = "SOFTWARE PROJETO",
+			        IF(
+			            CHAMADOS_BI[Tempo Total em Aberto] <= 60,
+			            "DENTRO",
+			            "FORA"
+			        ),
+			        BLANK()
+			    )
+			)
+		dataType: string
+		lineageTag: bf297923-7058-4908-b209-b6de3bb9a53d
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tempo Total em Aberto - Texto' =
+			
+			var hora = ROUNDDOWN(CHAMADOS_BI[Tempo Total em Aberto], 0)
+			var minuto = ROUNDDOWN((CHAMADOS_BI[Tempo Total em Aberto] - ROUNDDOWN(CHAMADOS_BI[Tempo Total em Aberto], 0)) * 60, 0)
+			
+			VAR tempo =
+			CONCATENATE(
+			    hora,
+			    CONCATENATE(
+			        ":",
+			        IF(
+			            minuto < 10,
+			            CONCATENATE(0, minuto),
+			            minuto
+			        )
+			    )
+			)
+			RETURN
+			if(
+			    CHAMADOS_BI[Tempo Total em Aberto] < 0,
+			    "0",
+			    tempo
+			)
+		dataType: string
+		lineageTag: f5a21c7f-8e30-4e28-a9b8-c469e5e0cea3
+		summarizeBy: none
+		isDataTypeInferred
+		sortByColumn: 'Tempo em Aberto - Classificação'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Tempo em Aberto - Classificação' = ```
+			
+			var hora = ROUNDDOWN(CHAMADOS_BI[Tempo Total em Aberto], 0)
+			var minuto = ROUNDDOWN((CHAMADOS_BI[Tempo Total em Aberto] - ROUNDDOWN(CHAMADOS_BI[Tempo Total em Aberto], 0)) * 60, 0)
+			RETURN
+			var tempo =
+			CONCATENATE(
+			    hora,
+			    CONCATENATE(
+			        ":",
+			        IF(
+			            minuto < 10,
+			            CONCATENATE(0, minuto),
+			            minuto
+			        )
+			    )
+			)
+			RETURN
+			var tempo2 =
+			CONVERT(
+			    SUBSTITUTE(
+			        tempo,
+			        ":",
+			        ","
+			    ),
+			    DOUBLE
+			) 
+			RETURN
+			
+			if(
+			    CHAMADOS_BI[Tempo Total em Aberto] < 0,
+			    0,
+			    tempo2
+			)
+			```
+		dataType: double
+		lineageTag: 63f69098-225a-42c9-9d12-99f2c73d6f9e
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column dt_agendamento
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 17034a33-5e1b-41b2-965e-9b62228f2ea7
+		summarizeBy: none
+		sourceColumn: dt_agendamento
+
+		variation Variation
+			isDefault
+			relationship: b72f5cf5-8058-4aee-b1d0-fab9f573fca6
+			defaultHierarchy: LocalDateTable_8ec9f198-355e-48ec-9530-0155c462f212.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition CHAMADOS_BI-3f363681-ab5d-4ab2-a5bb-8b7ef39bf149 = m
+		mode: import
+		source =
+				let
+				    Fonte = Sql.Database("samsung\matriz", "smartmanager", [Query="--CHAMADOS POWER BI V3#(lf)#(lf)SELECT#(lf)#(tab)ORDEM_SERVICO.cd_os,#(lf)#(tab)ds_identificacao3 AS tipo_os,#(lf)#(tab)ds_status,#(lf)#(tab)dt_ini AS dt_abertura,#(lf)#(tab)dt_fim,#(lf)#(tab)ds_solicitante,#(lf)#(tab)(SELECT TOP 1 ds_login FROM [SMARTSHARE].[dbo].[USUARIO] WHERE [SMARTSHARE].[dbo].[USUARIO].ds_usuario = ORDEM_SERVICO.ds_solicitante AND [SMARTSHARE].[dbo].[USUARIO].ds_senha = 'AUTOAD') AS ds_login,#(lf)#(tab)ds_aberta_por,#(lf)#(tab)ds_servico,#(lf)#(tab)ds_obs AS ds_solucao,#(lf)#(tab)FUNCIONARIO.ds_funcionario AS ds_tecnico,#(lf)#(tab)REGIAO.ds_regiao AS ds_regiao_tecnico,#(lf)#(tab)OS_CATEGORIA.ds_os_categoria,#(lf)#(tab)OS_PRODUTO.ds_os_produto,#(lf)#(tab)OS_PROCESSO.ds_os_processo,#(lf)#(tab)OS_PROBLEMA.ds_os_problema,#(lf)#(tab)(#(tab)SELECT TOP 1#(lf)#(tab)#(tab)#(tab)ds_funcionario#(lf)#(tab)#(tab)FROM#(lf)#(tab)#(tab)#(tab)LOG_OS WITH (NOLOCK) #(lf)#(tab)#(tab)#(tab)INNER JOIN FUNCIONARIO WITH (NOLOCK) ON FUNCIONARIO.ds_usuario = LOG_OS.ds_usuario#(lf)#(tab)#(tab)WHERE#(lf)#(tab)#(tab)#(tab)vl_os = ORDEM_SERVICO.cd_os#(lf)#(tab)#(tab)#(tab)AND cd_status = 5#(lf)#(tab)) AS ds_funcionario_atd_concluido,#(lf)#(tab)dt_agendamento#(lf)#(tab)--[DATALAKE_BI].dbo.FN_CALCULO_HORAS_UTEIS(ORDEM_SERVICO.dt_ini,COALESCE(ORDEM_SERVICO.dt_fim, getdate()),1) AS horas_uteis_conclusao_funcao#(lf)FROM#(lf)#(tab)ORDEM_SERVICO WITH (NOLOCK)#(lf)#(tab)LEFT JOIN TECNICO_SERVICO WITH (NOLOCK) ON ORDEM_SERVICO.cd_os = TECNICO_SERVICO.cd_os AND TECNICO_SERVICO.cd_tec_sev =#(lf)                             (SELECT        MAX(cd_tec_sev) AS Expr1#(lf)                               FROM            dbo.TECNICO_SERVICO#(lf)                               WHERE        (cd_os = dbo.ORDEM_SERVICO.cd_os))#(lf)#(tab)LEFT JOIN FUNCIONARIO WITH (NOLOCK) ON FUNCIONARIO.cd_funcionario = TECNICO_SERVICO.cd_funcionario#(lf)#(tab)LEFT JOIN REGIAO WITH (NOLOCK) ON REGIAO.cd_regiao = FUNCIONARIO.cd_regiao#(lf)#(tab)LEFT JOIN STATUS WITH (NOLOCK) ON  STATUS.cd_status = ORDEM_SERVICO.vl_status#(lf)#(tab)LEFT JOIN OS_CATEGORIZACAO WITH (NOLOCK) ON  ORDEM_SERVICO.cd_os = OS_CATEGORIZACAO.cd_os#(lf)#(tab)LEFT JOIN OS_CATEGORIA WITH (NOLOCK) ON  OS_CATEGORIA.cd_os_categoria = OS_CATEGORIZACAO.cd_os_categoria#(lf)    LEFT JOIN OS_PRODUTO WITH (NOLOCK) ON  OS_PRODUTO.cd_os_produto = OS_CATEGORIZACAO.cd_os_produto#(lf)    LEFT JOIN OS_PROCESSO WITH (NOLOCK) ON  OS_PROCESSO.cd_os_processo = OS_CATEGORIZACAO.cd_os_processo#(lf)    LEFT JOIN OS_PROBLEMA WITH (NOLOCK) ON  OS_PROBLEMA.cd_os_problema = OS_CATEGORIZACAO.cd_os_problema#(lf)WHERE#(lf)#(tab)cd_selb = 'PWBI'#(lf)#(tab)AND ds_identificacao3 IN ('SOFTWARE', 'SOFTWARE PROJETO')#(lf)#(tab)AND vl_status NOT IN (15, 26)#(lf)#(tab)AND (YEAR(dt_fim) >= 2024 OR dt_fim IS NULL)"]),
+				    #"Valor Substituído" = Table.ReplaceValue(Fonte,null,DateTimeZone.SwitchZone(DateTimeZone.LocalNow(),-3,0),Replacer.ReplaceValue,{"dt_fim"}),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Valor Substituído",{{"dt_fim", type datetime}}),
+				    #"Personalização Adicionada" = Table.AddColumn(#"Tipo Alterado", "Solicitante Tratado", each if [ds_login] is null then [ds_aberta_por] else [ds_login]),
+				    #"Texto em Maiúscula" = Table.TransformColumns(#"Personalização Adicionada",{{"Solicitante Tratado", Text.Upper, type text}}),
+				    #"Consultas Mescladas" = Table.NestedJoin(#"Texto em Maiúscula", {"Solicitante Tratado"}, FUNCIONARIOS, {"ds_usuario"}, "FUNCIONARIOS", JoinKind.LeftOuter),
+				    #"FUNCIONARIOS Expandido" = Table.ExpandTableColumn(#"Consultas Mescladas", "FUNCIONARIOS", {"ds_centro_custo"}, {"ds_centro_custo"}),
+				    #"Consultas Mescladas1" = Table.NestedJoin(#"FUNCIONARIOS Expandido", {"ds_centro_custo"}, CENTRO_DE_CUSTO, {"Centro de Custo"}, "CENTRO_DE_CUSTO", JoinKind.LeftOuter),
+				    #"CENTRO_DE_CUSTO Expandido" = Table.ExpandTableColumn(#"Consultas Mescladas1", "CENTRO_DE_CUSTO", {"Diretoria", "Área"}, {"Diretoria.A", "Área.A"}),
+				    #"Consultas Mescladas2" = Table.NestedJoin(#"CENTRO_DE_CUSTO Expandido", {"Solicitante Tratado"}, USUARIO, {"Solicitante Tratado"}, "USUARIO", JoinKind.LeftOuter),
+				    #"USUARIO Expandido" = Table.ExpandTableColumn(#"Consultas Mescladas2", "USUARIO", {"Diretoria", "Área"}, {"Diretoria.B", "Área.B"}),
+				    #"Personalização Adicionada1" = Table.AddColumn(#"USUARIO Expandido", "Diretoria", each if [ds_centro_custo] is null or [Diretoria.A] = "[Indefinido]" then [Diretoria.B] else [Diretoria.A], type text),
+				    #"Personalização Adicionada2" = Table.AddColumn(#"Personalização Adicionada1", "Área", each if [ds_centro_custo] is null or [Diretoria.A] = "[Indefinido]" then [Área.B] else [Área.A], type text),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Personalização Adicionada2",{"Diretoria.A", "Área.A", "Diretoria.B", "Área.B"})
+				in
+				    #"Colunas Removidas"
+
+	annotation PBI_ResultType = Table
+

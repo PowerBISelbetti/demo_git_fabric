@@ -1,0 +1,123 @@
+table RESPOSTAS_ANO_ATUAL_SOLUCOES
+	lineageTag: 9571f8bb-4efb-4dde-9f86-1a95ec582b8c
+
+	column cd_os
+		dataType: int64
+		formatString: 0
+		lineageTag: 9e229e4b-dbac-4f3e-a09c-b5bb093c4a39
+		summarizeBy: none
+		sourceColumn: cd_os
+
+		annotation SummarizationSetBy = Automatic
+
+	column cd_selb
+		dataType: string
+		lineageTag: b8be185b-30d0-4acc-a5a9-4a98be3f18f9
+		summarizeBy: none
+		sourceColumn: cd_selb
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_comentario
+		dataType: string
+		lineageTag: 479f3573-bfba-46e5-8e80-4bd15d00cf2a
+		summarizeBy: none
+		sourceColumn: ds_comentario
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_nome_fantasia
+		dataType: string
+		lineageTag: c17dd4ca-38ae-43e8-b1fb-e225034ce9c7
+		summarizeBy: none
+		sourceColumn: ds_nome_fantasia
+
+		annotation SummarizationSetBy = Automatic
+
+	column prioridade
+		dataType: string
+		lineageTag: 4f0c805a-43ce-4ed1-825b-a255509ccd36
+		summarizeBy: none
+		sourceColumn: prioridade
+
+		annotation SummarizationSetBy = Automatic
+
+	column tipo_os
+		dataType: string
+		lineageTag: 60745f2c-ea8d-4e26-98f8-92d78768c216
+		summarizeBy: none
+		sourceColumn: tipo_os
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_funcionario
+		dataType: string
+		lineageTag: f89605dc-3041-438a-a023-3fc21da96af2
+		summarizeBy: none
+		sourceColumn: ds_funcionario
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_regiao
+		dataType: string
+		lineageTag: 68501cb8-61dd-45b2-9c8a-a5bc55551ed8
+		summarizeBy: none
+		sourceColumn: ds_regiao
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_resposta
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b3107371-c32d-43d4-a4d9-f7f3317b195e
+		summarizeBy: none
+		sourceColumn: dt_resposta
+
+		variation Variation
+			isDefault
+			relationship: 12a85bd4-fa0c-4bfb-9e79-421a152e09b5
+			defaultHierarchy: LocalDateTable_02711203-dd24-4000-90c8-bd1a089c9f39.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column vl_nota
+		dataType: int64
+		formatString: 0
+		lineageTag: ae26ea8b-a4a1-4e15-92eb-9055ce07249c
+		summarizeBy: sum
+		sourceColumn: vl_nota
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Início do Mês'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5fff9926-45dd-4e76-8d07-31ca634f0cda
+		summarizeBy: none
+		sourceColumn: Início do Mês
+
+		variation Variation
+			isDefault
+			relationship: b918285a-a532-407f-98af-dafe0308be43
+			defaultHierarchy: LocalDateTable_ae2d8da8-11bb-440d-825c-9932e87d6ef4.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition RESPOSTAS_ANO_ATUAL_SOLUCOES-6b58ddb5-4a32-46cb-99f1-45a31f96d544 = m
+		mode: import
+		source =
+				let
+				    Fonte = PowerPlatform.Dataflows(null),
+				    Workspaces = Fonte{[Id="Workspaces"]}[Data],
+				    #"93a68bba-ad79-4a95-bc47-249fd6f63fb7" = Workspaces{[workspaceId="93a68bba-ad79-4a95-bc47-249fd6f63fb7"]}[Data],
+				    #"f2983b22-b480-47bc-b01a-eef6bd1a8c0c" = #"93a68bba-ad79-4a95-bc47-249fd6f63fb7"{[dataflowId="f2983b22-b480-47bc-b01a-eef6bd1a8c0c"]}[Data],
+				    RESPOSTAS_ANO_ATUAL_SOLUCOES_ = #"f2983b22-b480-47bc-b01a-eef6bd1a8c0c"{[entity="RESPOSTAS_ANO_ATUAL_SOLUCOES",version=""]}[Data],
+				    #"Linhas Filtradas" = Table.SelectRows(RESPOSTAS_ANO_ATUAL_SOLUCOES_, each [cd_selb] = "PWBI"),
+				    #"Linhas Filtradas1" = Table.SelectRows(#"Linhas Filtradas", each Date.IsInCurrentYear([Início do Mês]))
+				in
+				    #"Linhas Filtradas1"
+
+	annotation PBI_ResultType = Table
+

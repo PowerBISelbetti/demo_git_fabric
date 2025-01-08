@@ -1,0 +1,82 @@
+table Calendário
+	lineageTag: 1d14489e-63ce-46b2-a4c9-61041d42870f
+
+	column Data
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: e8d510cc-9a18-4402-88ef-c9bf3a31bf4c
+		summarizeBy: none
+		sourceColumn: Data
+
+		variation Variation
+			isDefault
+			relationship: 9b73a098-b910-4f83-b80d-83df06d7f737
+			defaultHierarchy: LocalDateTable_cea78278-b463-4a10-ade6-d453fd37e4f3.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Dia Útil'
+		dataType: int64
+		lineageTag: 40799ff1-9c7a-4e05-a78d-4f3579244638
+		summarizeBy: sum
+		sourceColumn: Dia Útil
+
+		changedProperty = FormatString
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Início do Mês'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6a6f1fb7-f81b-454b-8342-a9b0d2f55972
+		summarizeBy: none
+		sourceColumn: Início do Mês
+
+		variation Variation
+			isDefault
+			relationship: 2e457d08-040a-4657-a3a7-916267767404
+			defaultHierarchy: LocalDateTable_6cf162fd-02fe-43b8-b093-5d49c3431e95.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Quadrimestre =
+			
+			SWITCH(
+			    'Calendário'[Início do Mês].[MonthNo],
+			    1, 	"Q1",
+			    2, 	"Q1",
+			    3, 	"Q1",
+			    4, 	"Q1",
+			    5, 	"Q2",
+			    6, 	"Q2",
+			    7, 	"Q2",
+			    8, 	"Q2",
+			    9, 	"Q3",
+			    10, "Q3",
+			    11, "Q3",
+			    12, "Q3"
+			)
+		dataType: string
+		lineageTag: ba032e6b-e353-4b43-b384-b5b625550fe9
+		summarizeBy: none
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Calendário-e812fa3c-14e8-46c3-b171-e478628a8795 = m
+		mode: import
+		source =
+				let
+				    Fonte = Sql.Database("samsung\matriz", "smartmanager", [Query="SELECT#(lf)#(tab)BI_CALENDARIO.dt_data AS 'Data'#(lf)#(tab),CASE WHEN (DATEPART(dw,BI_CALENDARIO.dt_data) IN (7,1) OR FERIADO.ds_feriado IS NOT NULL) THEN 0 ELSE 1 END AS 'Dia Útil'#(lf)#(tab),CONVERT(DATE,DATEADD(DAY,1,EOMONTH(BI_CALENDARIO.dt_data,-1)),103) AS 'Início do Mês'#(lf)FROM BI_CALENDARIO WITH (NOLOCK)#(lf)#(tab)LEFT JOIN FERIADO WITH (NOLOCK) ON FERIADO.dt_feriado = BI_CALENDARIO.dt_data AND FERIADO.ds_feriado <> 'CARNAVAL'#(lf)WHERE#(lf)#(tab)YEAR(BI_CALENDARIO.dt_data) >= 2020#(lf)#(tab)AND YEAR(BI_CALENDARIO.dt_data) <= YEAR(GETDATE())+5#(lf)ORDER BY#(lf)#(tab)BI_CALENDARIO.dt_data"]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"Início do Mês", type date}, {"Data", type date}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

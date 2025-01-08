@@ -1,0 +1,49 @@
+expression FUNCIONARIOS =
+		let
+		    Fonte = PowerPlatform.Dataflows(null),
+		    Workspaces = Fonte{[Id="Workspaces"]}[Data],
+		    #"93a68bba-ad79-4a95-bc47-249fd6f63fb7" = Workspaces{[workspaceId="93a68bba-ad79-4a95-bc47-249fd6f63fb7"]}[Data],
+		    #"b81a134b-468f-4b3f-9943-651706d84b69" = #"93a68bba-ad79-4a95-bc47-249fd6f63fb7"{[dataflowId="b81a134b-468f-4b3f-9943-651706d84b69"]}[Data],
+		    FUNCIONARIOS_ = #"b81a134b-468f-4b3f-9943-651706d84b69"{[entity="FUNCIONARIOS",version=""]}[Data],
+		    #"Duplicatas Removidas" = Table.Distinct(FUNCIONARIOS_, {"ds_funcionario"})
+		in
+		    #"Duplicatas Removidas"
+	lineageTag: 6475fb42-5542-40d3-bf93-246dde80f11f
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+
+expression CENTRO_DE_CUSTO =
+		let
+		    Fonte = Excel.Workbook(File.Contents("\\ricoh\ASSISTENCIA_TECNICA_ADM\Power BI\TABELAS\BI\DIRETORIA_AREA.xlsx"), null, true),
+		    CENTRO_DE_CUSTO_Sheet = Fonte{[Item="CENTRO_DE_CUSTO",Kind="Sheet"]}[Data],
+		    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(CENTRO_DE_CUSTO_Sheet, [PromoteAllScalars=true]),
+		    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Centro de Custo", type text}, {"Diretoria", type text}, {"Área", type text}, {"Column4", type any}, {"inicio_tabela_local", type any}, {"fim_tabela_local", type any}, {"matriz_local", type text}}),
+		    #"Outras Colunas Removidas" = Table.SelectColumns(#"Tipo Alterado",{"Centro de Custo", "Diretoria", "Área"}),
+		    #"Linhas Filtradas" = Table.SelectRows(#"Outras Colunas Removidas", each [Centro de Custo] <> null and [Centro de Custo] <> "")
+		in
+		    #"Linhas Filtradas"
+	lineageTag: f1b333f9-5e22-46cf-b4cf-c6e184100926
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+
+expression USUARIO =
+		let
+		    Fonte = Excel.Workbook(File.Contents("\\ricoh\ASSISTENCIA_TECNICA_ADM\Power BI\TABELAS\BI\DIRETORIA_AREA.xlsx"), null, true),
+		    USUARIO_Sheet = Fonte{[Item="USUARIO",Kind="Sheet"]}[Data],
+		    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(USUARIO_Sheet, [PromoteAllScalars=true]),
+		    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Solicitante Tratado", type text}, {"Diretoria", type text}, {"Área", type text}, {"Column4", type any}, {"inicio_tabela_local", type any}, {"fim_tabela_local", type any}, {"matriz_local", type text}}),
+		    #"Outras Colunas Removidas" = Table.SelectColumns(#"Tipo Alterado",{"Solicitante Tratado", "Diretoria", "Área"}),
+		    #"Linhas Filtradas" = Table.SelectRows(#"Outras Colunas Removidas", each [Solicitante Tratado] <> null and [Solicitante Tratado] <> ""),
+		    #"Texto em Maiúscula" = Table.TransformColumns(#"Linhas Filtradas",{{"Solicitante Tratado", Text.Upper, type text}})
+		in
+		    #"Texto em Maiúscula"
+	lineageTag: 17c41982-156c-4d4f-8636-658b553a6452
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

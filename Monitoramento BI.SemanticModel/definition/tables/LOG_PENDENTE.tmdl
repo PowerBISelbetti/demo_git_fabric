@@ -1,0 +1,209 @@
+table LOG_PENDENTE
+	lineageTag: e1f14ae6-db97-4374-9a83-382a42ebcb1c
+
+	column vl_os
+		dataType: int64
+		formatString: 0
+		lineageTag: 9823f06a-1537-4ca3-a581-74cb0e9edc7a
+		summarizeBy: none
+		sourceColumn: vl_os
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_status
+		dataType: string
+		lineageTag: 81e3fa5d-d6f4-40bb-ba9a-4dc0c1197167
+		summarizeBy: none
+		sourceColumn: ds_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_usuario_pendente
+		dataType: string
+		lineageTag: 446141c5-d64a-4227-82a8-92171b4ab1b2
+		summarizeBy: none
+		sourceColumn: ds_usuario_pendente
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_pendente
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 058abd94-7a7b-49f4-a1a1-eabb2f1271d1
+		summarizeBy: none
+		sourceColumn: dt_pendente
+
+		variation Variation
+			isDefault
+			relationship: b201dc3b-eb40-4456-8dd6-0722c47ea00c
+			defaultHierarchy: LocalDateTable_f25f5685-99aa-480c-9504-7cf339ab392e.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_usuario_saida_pendente
+		dataType: string
+		lineageTag: d07c6b9a-a694-4281-bc87-8b517bc73a8b
+		summarizeBy: none
+		sourceColumn: ds_usuario_saida_pendente
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_status_saida_pendente
+		dataType: string
+		lineageTag: f585e325-122b-4621-b6ad-37d234b99168
+		summarizeBy: none
+		sourceColumn: ds_status_saida_pendente
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_saida_pendente
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e04efac4-19a1-44b9-a2f8-c16d3c8e1364
+		summarizeBy: none
+		sourceColumn: dt_saida_pendente
+
+		variation Variation
+			isDefault
+			relationship: e143d1bc-3d5f-468d-9511-92103cb74245
+			defaultHierarchy: LocalDateTable_ec1b9848-b480-4b32-8f70-d410753731c7.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column horas_uteis_pendente_funcao
+		dataType: string
+		lineageTag: ad3b3285-6cf6-4213-9e80-a827ca72fc60
+		summarizeBy: none
+		sourceColumn: horas_uteis_pendente_funcao
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Horas Úteis em Pendente' = ```
+			
+			VAR inicio_sla = FORMAT(CONVERT("07:30:00",DATETIME), "long time")   //<<< REFERENCIAR INICIO DO EXPEDIENTE
+			VAR inicio_almoco = FORMAT(CONVERT("12:00:00",DATETIME), "long time") //<<< REFERENCIAR INICIO DO ALMOÇO
+			VAR fim_almoco = FORMAT(CONVERT("13:12:00",DATETIME), "long time")   //<<< REFERENCIAR RETORNO DO ALMOÇO
+			VAR fim_sla = FORMAT(CONVERT("17:30:00",DATETIME), "long time")    //<<< REFERENCIAR FIM DO EXPEDIENTE
+			VAR evento1 = FORMAT( LOG_PENDENTE[dt_pendente], "long time" )  //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 1
+			VAR evento2 = FORMAT (LOG_PENDENTE[dt_saida_pendente], "long time" )  //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 2
+			VAR dia_evento1 = DATE(YEAR(LOG_PENDENTE[dt_pendente]), MONTH(LOG_PENDENTE[dt_pendente]), DAY(LOG_PENDENTE[dt_pendente]))    //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 1
+			VAR dia_evento2 = LOG_PENDENTE[dt_saida_pendente].[Date]    //<<< REFERENCIAR COLUNA COM DATA/HORA DO EVENTO 2
+			RETURN
+			//Definindo horas consideradas como início de SLA dos eventos 1 e 2//
+			VAR hr_evento1 =
+			    IF (
+			        evento1 <= inicio_sla,
+			        inicio_sla,
+			        IF (
+			            evento1 <= inicio_almoco,
+			            evento1,
+			            IF (
+			                evento1 <= fim_almoco,
+			                fim_almoco,
+			                IF ( evento1 <= fim_sla, evento1, fim_sla )
+			            )
+			        )
+			    )
+			VAR hr_evento2 =
+			    IF (
+			        evento2 >= fim_sla,
+			        fim_sla,
+			        IF (
+			            evento2 >= fim_almoco,
+			            evento2,
+			            IF (
+			                evento2 >= inicio_almoco,
+			                inicio_almoco,
+			                IF ( evento2 >= inicio_sla, evento2, inicio_sla )
+			            )
+			        )
+			    ) 
+			        
+			//DEFININDO DURAÇÃO DA HORA DE ALMOÇO
+			        
+			VAR hr_almoco_dias_diferentes_1 =
+			    IF ( evento1 < inicio_almoco, fim_almoco - inicio_almoco, 0 )
+			VAR hr_almoco_dias_diferentes_2 =
+			    IF ( evento2 > fim_almoco, fim_almoco - inicio_almoco, 0 )
+			VAR hr_almoco_mesmo_dia =
+			    IF (
+			        AND ( evento1 < inicio_almoco, evento2 > fim_almoco ),
+			        fim_almoco - inicio_almoco,
+			        IF (
+			            AND ( evento1 > inicio_almoco, evento2 < fim_almoco ),
+			            inicio_almoco - fim_almoco
+			        )
+			    )
+			RETURN
+			    
+			//CÁLCULO DE HORAS ÚTEIS - EVENTOS OCORREM NO MESMO DIA
+			
+			IF (
+			    dia_evento1 = dia_evento2,
+			    IF (
+			        LOOKUPVALUE ( 'CALENDÁRIO'[Dia Útil], 'CALENDÁRIO'[Data].[Date], dia_evento1 ) = 1,
+			        IF (
+			            ( ( hr_evento2 - hr_evento1 - hr_almoco_mesmo_dia ) * 24 ) < 0,
+			            0,
+			            ( ( hr_evento2 - hr_evento1 - hr_almoco_mesmo_dia ) * 24 )
+			        ),
+			        0
+			    ),         
+			    //CÁLCULO DE HORAS ÚTEIS - EVENTOS CORREM EM DIAS DIFERENTES
+			    
+			    IF (
+			        dia_evento1 > dia_evento2
+			            || dia_evento1 = 0
+			            || dia_evento2 = 0,
+			        0,
+			        VAR hr_dia_1 =
+			            IF (
+			                LOOKUPVALUE ( 'CALENDÁRIO'[Dia Útil], 'CALENDÁRIO'[Data].[Date], dia_evento1 ) = 1,
+			                fim_sla - hr_evento1 - hr_almoco_dias_diferentes_1,
+			                0
+			            )
+			        VAR hr_dia_inter =
+			            CALCULATE (
+			                SUM ( 'CALENDÁRIO'[Dia Útil] ),
+			                DATESBETWEEN (
+			                    'CALENDÁRIO'[Data],
+			                    dia_evento1 + 1,
+			                    dia_evento2 - 1
+			                )
+			            ) * ( ( inicio_almoco - inicio_sla ) + ( fim_sla - fim_almoco ) )
+			        VAR hr_dia_final =
+			            IF (
+			                LOOKUPVALUE ( 'CALENDÁRIO'[Dia Útil], 'CALENDÁRIO'[Data].[Date], dia_evento2 ) = 1,
+			                hr_evento2 - inicio_sla - hr_almoco_dias_diferentes_2,
+			                0
+			            )
+			        RETURN
+			            IF (
+			                ( ( hr_dia_1 + hr_dia_inter + hr_dia_final ) * 24 ) < 0,
+			                0,
+			                ( ( hr_dia_1 + hr_dia_inter + hr_dia_final ) * 24 )
+			            )
+			    )
+			)
+			```
+		dataType: double
+		lineageTag: 87ce91ea-6d4c-4047-ae83-f078d9edda38
+		summarizeBy: sum
+		isDataTypeInferred
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition LOG_PENDENTE = m
+		mode: import
+		source =
+				let
+				    Fonte = Sql.Database("samsung\matriz", "smartmanager", [Query="--ENTRADAS E SAÍDAS DE CHAMADOS PWBI EM PENDENTE CLIENTE ou PENDENTE FORNECEDOR#(lf)#(lf)SELECT#(lf)#(tab)*,#(lf)#(tab)[DATALAKE_BI].dbo.FN_CALCULO_HORAS_UTEIS(dt_pendente,COALESCE(dt_saida_pendente, getdate()),1) AS horas_uteis_pendente_funcao#(lf)FROM#(lf)(#(lf)#(tab)SELECT#(lf)#(tab)#(tab)vl_os,#(lf)#(tab)#(tab)ds_status,#(lf)#(tab)#(tab)ds_usuario AS ds_usuario_pendente,#(lf)#(tab)#(tab)dt_log_os AS dt_pendente,#(lf)#(tab)#(tab)(#(lf)#(tab)#(tab)SELECT TOP 1#(lf)#(tab)#(tab)#(tab)ds_usuario#(lf)#(tab)#(tab)FROM#(lf)#(tab)#(tab)#(tab)LOG_OS AS LOG_SAIDA WITH (NOLOCK)#(lf)#(tab)#(tab)WHERE#(lf)#(tab)#(tab)#(tab)LOG_SAIDA.vl_os = LOG_OS.vl_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.dt_log_os >  LOG_OS.dt_log_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.cd_status NOT IN (19) --Status que não encerram AGENDAMENTO#(lf)#(tab)#(tab)ORDER BY dt_log_os ASC#(lf)#(tab)#(tab)) ds_usuario_saida_pendente,#(lf)#(tab)#(tab)(#(lf)#(tab)#(tab)SELECT TOP 1#(lf)#(tab)#(tab)#(tab)ds_status#(lf)#(tab)#(tab)FROM#(lf)#(tab)#(tab)#(tab)LOG_OS AS LOG_SAIDA WITH (NOLOCK)#(lf)#(tab)#(tab)#(tab)INNER JOIN STATUS WITH (NOLOCK) ON STATUS.cd_status = LOG_SAIDA.cd_status#(lf)#(tab)#(tab)WHERE#(lf)#(tab)#(tab)#(tab)LOG_SAIDA.vl_os = LOG_OS.vl_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.dt_log_os >  LOG_OS.dt_log_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.cd_status NOT IN (19) --Status que não encerram AGENDAMENTO#(lf)#(tab)#(tab)ORDER BY dt_log_os ASC#(lf)#(tab)#(tab)) ds_status_saida_pendente,#(lf)#(tab)#(tab)(#(lf)#(tab)#(tab)SELECT TOP 1#(lf)#(tab)#(tab)#(tab)dt_log_os#(lf)#(tab)#(tab)FROM#(lf)#(tab)#(tab)#(tab)LOG_OS AS LOG_SAIDA WITH (NOLOCK)#(lf)#(tab)#(tab)WHERE#(lf)#(tab)#(tab)#(tab)LOG_SAIDA.vl_os = LOG_OS.vl_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.dt_log_os >  LOG_OS.dt_log_os#(lf)#(tab)#(tab)#(tab)AND LOG_SAIDA.cd_status NOT IN (19) --Status que não encerram AGENDAMENTO#(lf)#(tab)#(tab)ORDER BY dt_log_os ASC#(lf)#(tab)#(tab)) dt_saida_pendente#(lf)#(tab)FROM#(lf)#(tab)#(tab)LOG_OS WITH (NOLOCK)#(lf)#(tab)#(tab)INNER JOIN ORDEM_SERVICO WITH (NOLOCK) ON ORDEM_SERVICO.cd_os = LOG_OS.vl_os#(lf)#(tab)#(tab)INNER JOIN STATUS WITH (NOLOCK) ON STATUS.cd_status = LOG_OS.cd_status#(lf)#(tab)WHERE#(lf)#(tab)#(tab)cd_selb = 'PWBI'#(lf)#(tab)#(tab)AND LOG_OS.cd_status IN (30, 31)#(lf)) AS LOG_PENDENTE"]),
+				    #"Valor Substituído" = Table.ReplaceValue(Fonte,null,DateTimeZone.SwitchZone(DateTimeZone.LocalNow(),-3,0),Replacer.ReplaceValue,{"dt_saida_pendente"}),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Valor Substituído",{{"dt_saida_pendente", type datetime}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

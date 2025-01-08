@@ -1,0 +1,139 @@
+relationship 9b73a098-b910-4f83-b80d-83df06d7f737
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Calendário.Data
+	toColumn: LocalDateTable_cea78278-b463-4a10-ade6-d453fd37e4f3.Date
+
+relationship 2e457d08-040a-4657-a3a7-916267767404
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Calendário.'Início do Mês'
+	toColumn: LocalDateTable_6cf162fd-02fe-43b8-b093-5d49c3431e95.Date
+
+relationship bb218713-9ce2-4c43-9379-ae98d66fdb1f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: OS_ACOMP_BI.dt_acompanhamento
+	toColumn: LocalDateTable_c6c578a9-df4e-473b-94e7-7888db5c3f54.Date
+
+relationship 8577f44a-3bcf-4a33-91a7-b6d0d155193e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: OS_ACOMP_BI.dt_agendamento
+	toColumn: LocalDateTable_d217276f-dbfe-424f-b0a3-b406f9b7b8fb.Date
+
+relationship 331e9051-4632-43ed-ad72-705459776fb2
+	fromColumn: OS_ACOMP_BI.cd_os
+	toColumn: CHAMADOS_BI.cd_os
+
+relationship 12a85bd4-fa0c-4bfb-9e79-421a152e09b5
+	joinOnDateBehavior: datePartOnly
+	fromColumn: RESPOSTAS_ANO_ATUAL_SOLUCOES.dt_resposta
+	toColumn: LocalDateTable_02711203-dd24-4000-90c8-bd1a089c9f39.Date
+
+relationship b918285a-a532-407f-98af-dafe0308be43
+	joinOnDateBehavior: datePartOnly
+	fromColumn: RESPOSTAS_ANO_ATUAL_SOLUCOES.'Início do Mês'
+	toColumn: LocalDateTable_ae2d8da8-11bb-440d-825c-9932e87d6ef4.Date
+
+relationship 1843cc28-f884-4594-9ce4-cef366886045
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Atualização.Atualização
+	toColumn: LocalDateTable_5647dc8d-bf0c-4aee-a770-5f7092765488.Date
+
+relationship 5f70028d-a90e-4925-9006-3018a3c8c4c5
+	fromColumn: RESPOSTAS_ANO_ATUAL_SOLUCOES.cd_os
+	toColumn: CHAMADOS_BI.cd_os
+
+relationship 860e398d-cb4e-4a7f-95d8-847fcf5afc0d
+	joinOnDateBehavior: datePartOnly
+	fromColumn: CHAMADOS_BI.dt_fim_considerada
+	toColumn: LocalDateTable_10875ab9-d71e-4869-8a3d-51adeadc49f6.Date
+
+relationship 493bcbfe-38c6-4ab6-91d9-6f25b2f75f3a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: CHAMADOS_BI.dt_fim
+	toColumn: LocalDateTable_6a8d2090-f0cc-4261-8c82-ac806fdd0dae.Date
+
+relationship 3a084a26-100f-4e2c-98b5-cc98e45a2010
+	fromColumn: CHAMADOS_BI.'Data Fim'
+	toColumn: Calendário.Data
+
+relationship 7b205ffb-053e-4fba-98e4-46c8cb77fe28
+	joinOnDateBehavior: datePartOnly
+	fromColumn: CHAMADOS_BI.dt_abertura
+	toColumn: LocalDateTable_702baf06-f66e-48e8-99f5-cce585afa838.Date
+
+relationship 6ca55af9-9d87-4631-8898-0f9d53aa6480
+	isActive: false
+	fromColumn: CHAMADOS_BI.'Data Abertura'
+	toColumn: Calendário.Data
+
+relationship 047e43ff-3f5f-4c75-9fd0-765ef86a2646
+	joinOnDateBehavior: datePartOnly
+	fromColumn: CHAMADOS_BI_CANCELADOS.dt_abertura
+	toColumn: LocalDateTable_8e0a8ef8-6c18-44db-a2c3-75ab542954fa.Date
+
+relationship 1fb98d18-de0a-4734-9a6b-d2e351450835
+	joinOnDateBehavior: datePartOnly
+	fromColumn: CHAMADOS_BI_CANCELADOS.dt_fim
+	toColumn: LocalDateTable_c7f398a4-89df-408c-82f5-6873baecf4b6.Date
+
+relationship e54ab116-b339-45ed-bf2a-288d612d05c6
+	fromColumn: CHAMADOS_BI_CANCELADOS.'Data Fim'
+	toColumn: Calendário.Data
+
+relationship fa7423fa-f478-474a-ae68-d672421d705a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: CHAMADOS_APOIO.dt_ini
+	toColumn: LocalDateTable_f3be5672-437e-421e-8487-ab5e163be611.Date
+
+relationship a847a9bb-1ebb-4e21-826f-48e2dbc4b049
+	joinOnDateBehavior: datePartOnly
+	fromColumn: CHAMADOS_APOIO.dt_fim
+	toColumn: LocalDateTable_957075cb-490e-4155-9760-d544c5bab155.Date
+
+relationship 8fdd2157-c324-4078-b1b3-4577a94e3fec
+	fromColumn: CHAMADOS_APOIO.'Data Fim'
+	toColumn: Calendário.Data
+
+relationship b201dc3b-eb40-4456-8dd6-0722c47ea00c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: LOG_PENDENTE.dt_pendente
+	toColumn: LocalDateTable_f25f5685-99aa-480c-9504-7cf339ab392e.Date
+
+relationship e143d1bc-3d5f-468d-9511-92103cb74245
+	joinOnDateBehavior: datePartOnly
+	fromColumn: LOG_PENDENTE.dt_saida_pendente
+	toColumn: LocalDateTable_ec1b9848-b480-4b32-8f70-d410753731c7.Date
+
+relationship cf83a486-7df6-410a-8399-45faa7364913
+	fromColumn: LOG_PENDENTE.vl_os
+	toColumn: CHAMADOS_BI.cd_os
+
+relationship 56cc05b2-120d-4c50-ac26-4620a255b665
+	joinOnDateBehavior: datePartOnly
+	fromColumn: LOG_AGENDAMENTOS.dt_agendamento
+	toColumn: LocalDateTable_72f452ef-2daa-4af6-b071-3dc9e3704c7a.Date
+
+relationship a6689aa2-19e1-422e-a4c8-4172beb997b6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: LOG_AGENDAMENTOS.dt_saida_agendamento
+	toColumn: LocalDateTable_9e883c75-0c93-466f-be9e-13fde987095e.Date
+
+relationship b72f5cf5-8058-4aee-b1d0-fab9f573fca6
+	joinOnDateBehavior: datePartOnly
+	fromColumn: CHAMADOS_BI.dt_agendamento
+	toColumn: LocalDateTable_8ec9f198-355e-48ec-9530-0155c462f212.Date
+
+relationship 2f424ed0-1cca-48e0-a7b9-7d9c6ad85ed9
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Consulta1.dt_em_deslocamento
+	toColumn: LocalDateTable_8b8e4d36-0dfb-4dc8-a469-73be1b536e24.Date
+
+relationship e7769239-b0fb-40be-84e1-2d5cd9068c9f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Consulta1.dt_em_atendimento
+	toColumn: LocalDateTable_8ff4b3ef-1744-460a-b18d-3a3b300f1898.Date
+
+relationship a84b8d31-2490-4691-ad9a-8e6607132ccd
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Consulta1.dt_atendimento_concluido
+	toColumn: LocalDateTable_000098a5-8911-4a4c-8136-055ce4da9465.Date
+

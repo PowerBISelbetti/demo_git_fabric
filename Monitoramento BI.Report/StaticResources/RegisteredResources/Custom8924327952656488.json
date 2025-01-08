@@ -1,0 +1,108 @@
+{
+  "name": "Custom",
+  "dataColors": [
+    "#118DFF",
+    "#12239E",
+    "#D98718",
+    "#3A3835",
+    "#7D5824",
+    "#0D7D2D",
+    "#D9B300",
+    "#D64550",
+    "#3599B8",
+    "#DFBFBF",
+    "#4AC5BB",
+    "#5F6B6D",
+    "#FB8281",
+    "#F4D25A",
+    "#7F898A",
+    "#A4DDEE",
+    "#FDAB89",
+    "#B687AC",
+    "#28738A",
+    "#A78F8F",
+    "#168980",
+    "#293537",
+    "#BB4A4A",
+    "#B59525",
+    "#475052",
+    "#6A9FB0",
+    "#BD7150",
+    "#7B4F71",
+    "#1B4D5C",
+    "#706060",
+    "#0F5C55",
+    "#1C2325"
+  ],
+  "good": "#0D7D2D",
+  "textClasses": {
+    "label": {
+      "color": "#666666"
+    },
+    "callout": {
+      "color": "#666666"
+    },
+    "title": {
+      "color": "#666666",
+      "fontFace": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif"
+    },
+    "header": {
+      "color": "#666666"
+    }
+  },
+  "backgroundLight": "#F1F3F2",
+  "foregroundNeutralTertiary": "#ADB3B2",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "border": [
+          {
+            "show": false
+          }
+        ],
+        "visualTooltip": [
+          {
+            "titleFontColor": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "valueFontColor": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            }
+          }
+        ],
+        "outspacePane": [
+          {
+            "foregroundColor": {
+              "solid": {
+                "color": "#666666"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "outspace": [
+          {
+            "color": {
+              "solid": {
+                "color": "#E6E6E6"
+              }
+            },
+            "transparency": 90
+          }
+        ],
+        "background": [
+          {
+            "transparency": 0
+          }
+        ]
+      }
+    }
+  }
+}

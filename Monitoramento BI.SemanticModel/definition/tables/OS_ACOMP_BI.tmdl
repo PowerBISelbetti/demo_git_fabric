@@ -1,0 +1,118 @@
+table OS_ACOMP_BI
+	lineageTag: 3e089003-0996-4868-874b-1205720c2269
+
+	column cd_acompanhamento
+		dataType: int64
+		formatString: 0
+		lineageTag: c9f1e417-3f05-4e1d-870b-4c3a00c02dd6
+		summarizeBy: sum
+		sourceColumn: cd_acompanhamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column cd_os
+		dataType: int64
+		formatString: 0
+		lineageTag: f7069d6c-ae70-4bdd-9762-c9e75a7a9e2a
+		summarizeBy: none
+		sourceColumn: cd_os
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_usuario
+		dataType: string
+		lineageTag: 41ff3806-7523-46b1-91dc-b5b62bef735d
+		summarizeBy: none
+		sourceColumn: ds_usuario
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_acompanhamento
+		dataType: string
+		lineageTag: 2ee3d95c-e228-4442-8391-47eb10ee7cbe
+		summarizeBy: none
+		sourceColumn: ds_acompanhamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_acompanhamento
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e0410340-1c02-4a1e-a2ec-921876a6d975
+		summarizeBy: none
+		sourceColumn: dt_acompanhamento
+
+		variation Variation
+			isDefault
+			relationship: bb218713-9ce2-4c43-9379-ae98d66fdb1f
+			defaultHierarchy: LocalDateTable_c6c578a9-df4e-473b-94e7-7888db5c3f54.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_usuario_cliente
+		dataType: string
+		lineageTag: 85d4c97b-d5c0-4e31-af7b-f1f68e83b193
+		summarizeBy: none
+		sourceColumn: ds_usuario_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column ds_acompanhamento_cliente
+		dataType: string
+		lineageTag: aeba1e40-47ca-4a11-9d46-2967a8a6fea2
+		summarizeBy: none
+		sourceColumn: ds_acompanhamento_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column st_lido
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a5b7212c-7b5e-4264-865e-0cfd06a8749a
+		summarizeBy: none
+		sourceColumn: st_lido
+
+		annotation SummarizationSetBy = Automatic
+
+	column st_lido_cliente
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 887875cc-1254-4c9c-8475-18539d360f20
+		summarizeBy: none
+		sourceColumn: st_lido_cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column dt_agendamento
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9dd450c2-2339-4e20-bb5b-255e2125f745
+		summarizeBy: none
+		sourceColumn: dt_agendamento
+
+		variation Variation
+			isDefault
+			relationship: 8577f44a-3bcf-4a33-91a7-b6d0d155193e
+			defaultHierarchy: LocalDateTable_d217276f-dbfe-424f-b0a3-b406f9b7b8fb.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+	column st_origem_api
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 9c71d433-62b5-465d-91db-a8612c7a8ceb
+		summarizeBy: none
+		sourceColumn: st_origem_api
+
+		annotation SummarizationSetBy = Automatic
+
+	partition OS_ACOMP_BI-2c3ea74c-91f9-4fc9-94ad-a0e5cc07f7b4 = m
+		mode: import
+		source =
+				let
+				    Fonte = Sql.Database("samsung\matriz", "smartmanager", [Query="--OS_ACOMPANHAMENTO#(lf)#(lf)SELECT#(lf)#(tab)*#(lf)FROM#(lf)#(tab)OS_ACOMPANHAMENTO#(lf)WHERE#(lf)#(tab)OS_ACOMPANHAMENTO.cd_os IN #(lf)#(tab)(#(lf)#(tab)#(tab)SELECT#(lf)#(tab)#(tab)#(tab)ORDEM_SERVICO.cd_os#(lf)#(tab)#(tab)FROM#(lf)#(tab)#(tab)#(tab)ORDEM_SERVICO WITH (NOLOCK)#(lf)#(tab)#(tab)#(tab)LEFT JOIN TECNICO_SERVICO WITH (NOLOCK) ON TECNICO_SERVICO.cd_os = ORDEM_SERVICO.cd_os#(lf)#(tab)#(tab)#(tab)LEFT JOIN FUNCIONARIO WITH (NOLOCK) ON FUNCIONARIO.cd_funcionario = TECNICO_SERVICO.cd_funcionario#(lf)#(tab)#(tab)#(tab)LEFT JOIN REGIAO WITH (NOLOCK) ON REGIAO.cd_regiao = FUNCIONARIO.cd_regiao#(lf)#(tab)#(tab)WHERE#(lf)#(tab)#(tab)#(tab)(cd_selb = 'PWBI' OR ds_regiao = 'PMO | BI')#(lf)#(tab))#(lf)#(tab)AND YEAR(dt_acompanhamento) >= 2024#(lf)"])
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+

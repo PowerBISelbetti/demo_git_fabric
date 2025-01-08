@@ -1,0 +1,30 @@
+table 'Meta Custo de Peça'
+	lineageTag: e90756be-0ad0-496b-9fb4-7f38ee954cae
+
+	measure 'Valor Meta Custo de Peça' = SELECTEDVALUE('Meta Custo de Peça'[Meta Custo de Peça], 75)
+		lineageTag: cf9fb382-7441-4e44-ab52-daf2f4a73c28
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Meta Custo de Peça'
+		dataType: double
+		lineageTag: 381d002d-1075-44eb-90e4-1ca294b23d52
+		summarizeBy: none
+		isDataTypeInferred
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Meta Custo de Peça' = calculated
+		mode: import
+		source = GENERATESERIES(5, 8, 0.1)
+
+	annotation PBI_Id = c6a1061be4c94a3ea753baec3f7bc169
+

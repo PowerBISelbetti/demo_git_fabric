@@ -1,0 +1,55 @@
+model Model
+	culture: pt-BR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: pt-BR
+	dataAccessOptions
+		fastCombine
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBIDesktopVersion = 2.137.1102.0 (24.10)
+
+annotation PBI_QueryOrder = ["Medidas","Atualização","Calendário","CHAMADOS_BI","CHAMADOS_BI_CANCELADOS","CHAMADOS_APOIO","OS_ACOMP_BI","RESPOSTAS_ANO_ATUAL_SOLUCOES","CENTRO_DE_CUSTO","USUARIO","FUNCIONARIOS","LOG_AGENDAMENTOS","LOG_PENDENTE","Consulta1"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table DateTableTemplate_af32d281-6418-427d-abed-547de25f7b6c
+ref table Atualização
+ref table Medidas
+ref table Calendário
+ref table LocalDateTable_cea78278-b463-4a10-ade6-d453fd37e4f3
+ref table LocalDateTable_6cf162fd-02fe-43b8-b093-5d49c3431e95
+ref table CHAMADOS_BI
+ref table OS_ACOMP_BI
+ref table LocalDateTable_c6c578a9-df4e-473b-94e7-7888db5c3f54
+ref table LocalDateTable_d217276f-dbfe-424f-b0a3-b406f9b7b8fb
+ref table RESPOSTAS_ANO_ATUAL_SOLUCOES
+ref table LocalDateTable_02711203-dd24-4000-90c8-bd1a089c9f39
+ref table LocalDateTable_ae2d8da8-11bb-440d-825c-9932e87d6ef4
+ref table LocalDateTable_5647dc8d-bf0c-4aee-a770-5f7092765488
+ref table LocalDateTable_10875ab9-d71e-4869-8a3d-51adeadc49f6
+ref table LocalDateTable_6a8d2090-f0cc-4261-8c82-ac806fdd0dae
+ref table LocalDateTable_702baf06-f66e-48e8-99f5-cce585afa838
+ref table CHAMADOS_BI_CANCELADOS
+ref table LocalDateTable_8e0a8ef8-6c18-44db-a2c3-75ab542954fa
+ref table LocalDateTable_c7f398a4-89df-408c-82f5-6873baecf4b6
+ref table CHAMADOS_APOIO
+ref table LocalDateTable_f3be5672-437e-421e-8487-ab5e163be611
+ref table LocalDateTable_957075cb-490e-4155-9760-d544c5bab155
+ref table LOG_AGENDAMENTOS
+ref table LOG_PENDENTE
+ref table LocalDateTable_f25f5685-99aa-480c-9504-7cf339ab392e
+ref table LocalDateTable_ec1b9848-b480-4b32-8f70-d410753731c7
+ref table LocalDateTable_72f452ef-2daa-4af6-b071-3dc9e3704c7a
+ref table LocalDateTable_9e883c75-0c93-466f-be9e-13fde987095e
+ref table LocalDateTable_8ec9f198-355e-48ec-9530-0155c462f212
+ref table 'Meta Custo de Peça'
+ref table Consulta1
+ref table LocalDateTable_8b8e4d36-0dfb-4dc8-a469-73be1b536e24
+ref table LocalDateTable_8ff4b3ef-1744-460a-b18d-3a3b300f1898
+ref table LocalDateTable_000098a5-8911-4a4c-8136-055ce4da9465
+
+ref cultureInfo pt-BR
+
