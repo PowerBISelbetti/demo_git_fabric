@@ -184,6 +184,9 @@ table Medidas
 		formatString: 0
 		lineageTag: 13047637-e058-47a1-a070-82ab36b95f8e
 
+	measure 'Nova medida' = "TESTE"
+		lineageTag: 9263db85-f2e9-4570-afc6-e98c8f081891
+
 	partition Medidas-79544295-b4b5-46c0-a7a6-e760173f95e9 = m
 		mode: import
 		source =

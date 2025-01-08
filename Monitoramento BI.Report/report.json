@@ -414,6 +414,15 @@
           "z": 7000.00
         },
         {
+          "config": "{\"name\":\"16a25566ffda13130a12\",\"layouts\":[{\"id\":0,\"position\":{\"x\":0,\"y\":288.3067092651757,\"width\":1280,\"height\":150,\"z\":19001}}],\"singleVisual\":{\"visualType\":\"card\",\"projections\":{\"Values\":[{\"queryRef\":\"Medidas.Nova medida\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"m\",\"Entity\":\"Medidas\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"m\"}},\"Property\":\"Nova medida\"},\"Name\":\"Medidas.Nova medida\",\"NativeReferenceName\":\"Nova medida\"}]},\"autoSelectVisualType\":true,\"drillFilterOtherVisuals\":true}}",
+          "filters": "[]",
+          "height": 150.00,
+          "width": 1280.00,
+          "x": 0.00,
+          "y": 288.31,
+          "z": 19001.00
+        },
+        {
           "config": "{\"name\":\"1d0a903dd04f34683a64\",\"layouts\":[{\"id\":0,\"position\":{\"x\":143.95136778115503,\"y\":27.23404255319149,\"z\":3000,\"width\":752.8267477203648,\"height\":29.179331306990882,\"tabOrder\":2000}}],\"singleVisual\":{\"visualType\":\"textbox\",\"drillFilterOtherVisuals\":true,\"objects\":{\"general\":[{\"properties\":{\"paragraphs\":[{\"textRuns\":[{\"value\":\"BACKLOG\",\"textStyle\":{\"fontWeight\":\"bold\",\"fontFamily\":\"Arial\",\"color\":\"#666666\"}}]}]}}]},\"vcObjects\":{\"background\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}],\"lockAspect\":[{\"properties\":{\"show\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]}}}",
           "filters": "[]",
           "height": 29.18,
